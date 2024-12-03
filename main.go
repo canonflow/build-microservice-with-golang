@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	app := application.New()
+	app := application.New(application.LoadConfig())
 
 	// Root level context
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
