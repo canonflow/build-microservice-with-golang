@@ -2,12 +2,13 @@ package application
 
 import (
 	"github.com/canonflow/build-microservice-with-golang/handler"
+	"github.com/canonflow/build-microservice-with-golang/repository/order"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
 )
 
-func loadRoutes() *chi.Mux {
+func (app *App) loadRoutes() {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -15,13 +16,17 @@ func loadRoutes() *chi.Mux {
 
 	})
 
-	router.Route("/orders", loadOrderRoutes)
+	router.Route("/orders", app.loadOrderRoutes)
 
-	return router
+	app.router = router
 }
 
-func loadOrderRoutes(router chi.Router) {
-	orderHandler := &handler.Order{}
+func (app *App) loadOrderRoutes(router chi.Router) {
+	orderHandler := &handler.Order{
+		Repo: &order.RedisRepo{
+			app.rdb,
+		},
+	}
 
 	router.Post("/", orderHandler.Create)
 	router.Get("/", orderHandler.List)

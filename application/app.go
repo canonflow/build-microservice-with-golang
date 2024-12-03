@@ -9,15 +9,16 @@ import (
 )
 
 type App struct {
-	route http.Handler
-	rdb   *redis.Client
+	router http.Handler
+	rdb    *redis.Client
 }
 
 func New() *App {
 	app := &App{
-		route: loadRoutes(),
-		rdb:   redis.NewClient(&redis.Options{}),
+		rdb: redis.NewClient(&redis.Options{}),
 	}
+
+	app.loadRoutes()
 
 	return app
 }
@@ -25,7 +26,7 @@ func New() *App {
 func (app *App) Start(ctx context.Context) error {
 	server := &http.Server{
 		Addr:    ":3000",
-		Handler: app.route,
+		Handler: app.router,
 	}
 
 	// Check Redis Connection
